@@ -242,4 +242,3 @@ Ask only these for FPGA work:
 ## What I Can Say In A Short Update
 
 I cross-checked the updated PCB interface against my FPGA/MATLAB work. The control math still gives three phase duty commands, but the FPGA output layer maps those into the board's physical HI/LO inputs. I updated the local RTL assumptions around disable behavior, Hall input, measured A/B/C current, voltage sense, and separate current-balance versus current-limit checks. Next I need confirmed pin mapping, ADC path, Hall voltage safety, current-sense offset, and dead-time policy before final XDC and full Vivado integration.
-
