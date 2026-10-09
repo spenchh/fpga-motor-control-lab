@@ -1,0 +1,28 @@
+# The site is index.html + assets/ at the repo root. Everything below is
+# project working material that would otherwise be uploaded on every
+# deploy (~150 MB). Do NOT add assets/ here — it holds the site CSS/JS.
+
+# Altium and hardware binaries
+*.PcbDoc
+*.SchDoc
+*.BomDoc
+__Previews/
+altium_conflict_backup_*/
+
+# Office documents and planning spreadsheets
+*.docx
+*.xlsx
+*.pdf
+
+# Bulk directories
+SURG/
+tmp/
+project_archive/
+Arduino-SimpleFOCShield-3.2/
+SimpleFOC-DriveShield-main/
+
+# Source that isn't part of the site
+fpga/
+matlab/
+arduino/
+*.zip

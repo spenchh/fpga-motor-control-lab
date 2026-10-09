@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560" role="img" aria-labelledby="title desc">
+  <title id="title">Current sensing options for FPGA field-oriented control</title>
+  <desc id="desc">Comparison diagram of three current-sensing paths: non-isolated PWM-rejection amplifier, isolated sigma-delta modulator, and Hall sensor. It highlights latency, isolation, and FPGA filtering implications.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28384d"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .box { fill: #ffffff; stroke: #28384d; stroke-width: 2; rx: 8; }
+      .sense1 { fill: #e7f4ee; stroke: #1f7a55; stroke-width: 2; rx: 8; }
+      .sense2 { fill: #eaf0ff; stroke: #315fba; stroke-width: 2; rx: 8; }
+      .sense3 { fill: #fff1e6; stroke: #b85c15; stroke-width: 2; rx: 8; }
+      .fpga { fill: #f4ecff; stroke: #6f42c1; stroke-width: 2; rx: 8; }
+      .wire { fill: none; stroke: #28384d; stroke-width: 2.4; marker-end: url(#arrow); }
+      .label { font: 700 20px Arial, sans-serif; fill: #162033; }
+      .text { font: 15px Arial, sans-serif; fill: #28384d; }
+      .small { font: 13px Arial, sans-serif; fill: #40526b; }
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1180" height="560"/>
+  <text class="label" x="34" y="46">Current sensing paths into FPGA FOC</text>
+  <text class="small" x="34" y="72">The main trade is isolation and filtering latency versus direct sampled-current timing.</text>
+
+  <rect class="box" x="50" y="132" width="205" height="310"/>
+  <text class="label" x="78" y="168">Phase / DC bus</text>
+  <text class="text" x="78" y="202">Shunt or conductor</text>
+  <text class="text" x="78" y="225">senses motor current</text>
+  <text class="text" x="78" y="270">Sampling should align</text>
+  <text class="text" x="78" y="293">with PWM center</text>
+
+  <rect class="sense1" x="345" y="96" width="270" height="105"/>
+  <text class="label" x="372" y="130">INA241 path</text>
+  <text class="text" x="372" y="158">Analog amplifier + ADC</text>
+  <text class="small" x="372" y="182">Fast, non-isolated, 110 V common-mode</text>
+
+  <rect class="sense2" x="345" y="228" width="270" height="116"/>
+  <text class="label" x="372" y="262">AMC1306 / AD7403</text>
+  <text class="text" x="372" y="290">Isolated sigma-delta</text>
+  <text class="small" x="372" y="314">Bitstream plus FPGA decimation filter</text>
+
+  <rect class="sense3" x="345" y="375" width="270" height="105"/>
+  <text class="label" x="372" y="409">Hall sensor path</text>
+  <text class="text" x="372" y="437">Isolated by physics</text>
+  <text class="small" x="372" y="461">Lower bandwidth/accuracy concern</text>
+
+  <rect class="fpga" x="740" y="170" width="350" height="210"/>
+  <text class="label" x="780" y="208">FPGA processing</text>
+  <text class="text" x="780" y="242">ADC interface or bitstream filter</text>
+  <text class="text" x="780" y="268">Offset/gain calibration</text>
+  <text class="text" x="780" y="294">Clarke/Park current inputs</text>
+  <text class="text" x="780" y="320">Fault threshold checks</text>
+  <text class="text" x="780" y="346">Telemetry to MCU</text>
+
+  <path class="wire" d="M255 190 H345"/>
+  <path class="wire" d="M255 285 H345"/>
+  <path class="wire" d="M255 410 H345"/>
+  <path class="wire" d="M615 148 H740"/>
+  <path class="wire" d="M615 286 H740"/>
+  <path class="wire" d="M615 427 H700 V330 H740"/>
+
+  <text class="small" x="632" y="132">sampled ADC</text>
+  <text class="small" x="632" y="270">1-bit stream</text>
+  <text class="small" x="632" y="413">analog output</text>
+  <text class="small" x="780" y="404">Rule of thumb: avoid MCU forwarding in the fast current loop.</text>
+</svg>

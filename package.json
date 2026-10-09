@@ -1,0 +1,19 @@
+{
+  "name": "fpga-motor-control-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SURG 2026 FPGA motor-controller project documentation site and assistant",
+  "scripts": {
+    "kb": "node tools/build-kb.mjs",
+    "test": "node tools/test-assistant.mjs",
+    "dev": "node tools/serve.mjs",
+    "check": "node tools/test-assistant.mjs"
+  },
+  "dependencies": {
+    "ai": "^7.0.55"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

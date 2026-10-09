@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="520" viewBox="0 0 1180 520" role="img" aria-labelledby="title desc">
+  <title id="title">FPGA and MCU field-oriented control partition</title>
+  <desc id="desc">Block diagram showing throttle and CAN inputs entering the MCU, supervisory commands flowing to FPGA hardware, and fast sensing, FOC, PWM, and fault shutdown staying in the FPGA path.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28384d"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .box { fill: #ffffff; stroke: #28384d; stroke-width: 2; rx: 8; }
+      .fpga { fill: #e7f4ee; stroke: #1f7a55; stroke-width: 2; rx: 8; }
+      .mcu { fill: #eaf0ff; stroke: #315fba; stroke-width: 2; rx: 8; }
+      .power { fill: #fff1e6; stroke: #b85c15; stroke-width: 2; rx: 8; }
+      .warn { fill: #ffecec; stroke: #b42318; stroke-width: 2; rx: 8; }
+      .label { font: 700 20px Arial, sans-serif; fill: #162033; }
+      .text { font: 15px Arial, sans-serif; fill: #28384d; }
+      .small { font: 13px Arial, sans-serif; fill: #40526b; }
+      .flow { fill: none; stroke: #28384d; stroke-width: 2.4; marker-end: url(#arrow); }
+      .fast { fill: none; stroke: #1f7a55; stroke-width: 3; marker-end: url(#arrow); }
+      .fault { fill: none; stroke: #b42318; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1180" height="520"/>
+  <text class="label" x="34" y="46">FPGA/MCU split for FOC motor control</text>
+  <text class="small" x="34" y="72">Fast current-loop behavior stays deterministic. Slow policy and communications stay flexible.</text>
+
+  <rect class="box" x="34" y="118" width="165" height="112"/>
+  <text class="label" x="56" y="150">Inputs</text>
+  <text class="text" x="56" y="178">Throttle</text>
+  <text class="text" x="56" y="201">Brake / enable</text>
+  <text class="text" x="56" y="224">CAN commands</text>
+
+  <rect class="mcu" x="260" y="98" width="235" height="166"/>
+  <text class="label" x="286" y="133">MCU</text>
+  <text class="text" x="286" y="162">Throttle shaping</text>
+  <text class="text" x="286" y="185">CAN + logging</text>
+  <text class="text" x="286" y="208">State machine</text>
+  <text class="text" x="286" y="231">Iq/id refs</text>
+
+  <rect class="fpga" x="575" y="78" width="275" height="220"/>
+  <text class="label" x="604" y="113">FPGA fabric</text>
+  <text class="text" x="604" y="143">Sensor capture</text>
+  <text class="text" x="604" y="166">Clarke / Park</text>
+  <text class="text" x="604" y="189">PI current loop</text>
+  <text class="text" x="604" y="212">Inverse transforms</text>
+  <text class="text" x="604" y="235">SVPWM / deadtime</text>
+  <text class="text" x="604" y="258">Fast fault shutoff</text>
+
+  <rect class="power" x="935" y="112" width="205" height="150"/>
+  <text class="label" x="958" y="147">Power stage</text>
+  <text class="text" x="958" y="176">Gate driver</text>
+  <text class="text" x="958" y="199">MOSFET / IGBT</text>
+  <text class="text" x="958" y="222">3-phase bridge</text>
+
+  <rect class="box" x="575" y="356" width="275" height="110"/>
+  <text class="label" x="604" y="390">Sensors</text>
+  <text class="text" x="604" y="420">Phase current, DC bus</text>
+  <text class="text" x="604" y="443">Rotor position, temperature</text>
+
+  <rect class="warn" x="935" y="356" width="205" height="110"/>
+  <text class="label" x="958" y="390">Hard faults</text>
+  <text class="text" x="958" y="420">OC / DESAT / VDS</text>
+  <text class="text" x="958" y="443">nFAULT to FPGA + MCU</text>
+
+  <path class="flow" d="M199 174 H260"/>
+  <path class="flow" d="M495 166 H575"/>
+  <path class="fast" d="M850 188 H935"/>
+  <path class="fast" d="M712 356 V298"/>
+  <path class="fault" d="M935 410 H850"/>
+  <path class="fault" d="M575 410 H495"/>
+
+  <text class="small" x="502" y="148">refs, modes, limits</text>
+  <text class="small" x="864" y="172">PWM gates</text>
+  <text class="small" x="688" y="338">sampled each PWM cycle</text>
+  <text class="small" x="438" y="431">fault status + rearm policy</text>
+</svg>

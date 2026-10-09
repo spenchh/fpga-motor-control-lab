@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560" role="img" aria-labelledby="title desc">
+  <title id="title">3PWM versus 6PWM gate-driver decision rule</title>
+  <desc id="desc">Decision diagram showing 3PWM when the gate driver creates complementary outputs and deadtime internally, and 6PWM when the driver exposes high-side and low-side inputs.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28384d"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .question { fill: #ffffff; stroke: #28384d; stroke-width: 2; rx: 8; }
+      .left { fill: #e7f4ee; stroke: #1f7a55; stroke-width: 2; rx: 8; }
+      .right { fill: #eaf0ff; stroke: #315fba; stroke-width: 2; rx: 8; }
+      .warn { fill: #fff1e6; stroke: #b85c15; stroke-width: 2; rx: 8; }
+      .label { font: 700 20px Arial, sans-serif; fill: #162033; }
+      .text { font: 15px Arial, sans-serif; fill: #28384d; }
+      .small { font: 13px Arial, sans-serif; fill: #40526b; }
+      .flow { fill: none; stroke: #28384d; stroke-width: 2.4; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect class="bg" width="1180" height="560"/>
+  <text class="label" x="34" y="46">PWM decision rule for the driver PCB</text>
+  <text class="small" x="34" y="72">The FPGA pin count and deadtime responsibility depend on the final gate-driver input interface.</text>
+
+  <rect class="question" x="385" y="112" width="410" height="110"/>
+  <text class="label" x="433" y="150">What does the gate driver expose?</text>
+  <text class="text" x="438" y="183">One PWM input per phase, or separate HIN/LIN?</text>
+
+  <rect class="left" x="76" y="300" width="430" height="165"/>
+  <text class="label" x="112" y="338">True 3PWM driver path</text>
+  <text class="text" x="112" y="370">FPGA outputs PWM_A, PWM_B, PWM_C.</text>
+  <text class="text" x="112" y="395">Gate driver creates complementary outputs.</text>
+  <text class="text" x="112" y="420">Gate driver owns deadtime.</text>
+  <text class="small" x="112" y="448">Example direction: LTC7063-style half-bridge per phase.</text>
+
+  <rect class="right" x="674" y="300" width="430" height="165"/>
+  <text class="label" x="710" y="338">6PWM driver path</text>
+  <text class="text" x="710" y="370">FPGA outputs HIN_A/LIN_A through HIN_C/LIN_C.</text>
+  <text class="text" x="710" y="395">FPGA inserts deadtime.</text>
+  <text class="text" x="710" y="420">More pins, more control, more responsibility.</text>
+  <text class="small" x="710" y="448">Example direction: GD30DR1488 HIN1-3 plus LIN1-3.</text>
+
+  <rect class="warn" x="391" y="484" width="398" height="50"/>
+  <text class="text" x="424" y="515">Both paths need PWM default-off behavior during reset/fault.</text>
+
+  <path class="flow" d="M498 222 C420 252 350 270 291 300"/>
+  <path class="flow" d="M682 222 C760 252 830 270 889 300"/>
+  <path class="flow" d="M291 465 C350 493 420 508 391 508"/>
+  <path class="flow" d="M889 465 C830 493 760 508 789 508"/>
+
+  <text class="small" x="366" y="275">internal deadtime?</text>
+  <text class="small" x="738" y="275">separate high/low?</text>
+</svg>

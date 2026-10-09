@@ -1,0 +1,67 @@
+SURG board interface check
+source schematic: C:\Users\HP\Documents\SURG\DriverBoard.SchDoc
+source pcb: C:\Users\HP\Documents\SURG\ActualDriverBoard.PcbDoc
+source bom: C:\Users\HP\Documents\SURG\HV Motor Driver.BomDoc
+fpga board: Arty Z7-10
+target control mode: 3PWM
+
+PWM timing
+fabric clock = 100.0 MHz
+requested f_pwm = 20000 Hz
+center-aligned period_counts = 2500
+actual f_pwm = 20000.00 Hz
+placeholder nonoverlap ticks = 20
+note: three duty commands are expanded in RTL to the updated PCB HI/LO driver-input pins
+
+IO budget from updated board labels
+confirmed digital inputs to FPGA = 3
+digital outputs from FPGA = 7
+analog inputs listed = 6
+disable polarity = active-high disable, drive low to run
+
+Digital outputs
+PWM_HI_A, PWM_LO_A, PWM_HI_B, PWM_LO_B, PWM_HI_C, PWM_LO_C, DISABLE
+
+Confirmed digital inputs
+MCU HALL A, MCU HALL B, MCU HALL C
+
+Analog inputs
+MCU CSENSE A, MCU CSENSE B, MCU CSENSE C, MCU VSENSE A, MCU VSENSE Vm, MCU MOTOR THERM
+
+Current-sense path from updated board
+chain = shunt -> AMC1300BDWV/AMC1300BDWVR -> OPA4388IDR -> MCU CSENSE
+measured phases = A, B, C
+differential nets = CSENSE A+, CSENSE A-, CSENSE B+, CSENSE B-, CSENSE C+, CSENSE C-
+controller nets = MCU CSENSE A, MCU CSENSE B, MCU CSENSE C
+AMC1300 gain = 8.20
+OPA4388 diff-stage gain = 1.00
+WARNING: final current-sense A-to-V scaling is not known yet
+need shunt value and bidirectional-current offset plan before final HDL scaling
+
+Voltage-sense path from updated board
+differential nets = VSENSE A+, VSENSE A-, VSENSE Vm+, VSENSE Vm-
+controller nets = MCU VSENSE A, MCU VSENSE Vm
+divider ratio = 0.013158
+96 V input into divider gives 1.263 V before isolation amp
+WARNING: final ADC-side voltage scaling still needs the Arty/ADC pin path
+
+Three-current balance check
+max ideal Ia + Ib + Ic error = 0.000000 A
+note: measured A/B/C is the active current assumption
+
+Hall input status
+MCU HALL A/B/C are confirmed digital labels into the controller header
+hardware question: Hall pullups are to 5 V, so Zynq input-level protection must be checked
+
+TODO list from board config
+- confirm exact Arty pin map
+- confirm HI/LO shield pin mapping against Arty constraints
+- confirm whether any protection/status signal is routed to FPGA; updated board shows no nOC/FAULT net
+- confirm phase shunt values
+- confirm AMC1300 + OPA4388 offset/filter values and whether bidirectional current has a mid-rail offset
+- confirm current sense voltage range into ADC
+- confirm whether current sense goes to Arty XADC or another ADC
+- confirm 5V Hall pullups are safe for the Zynq/Arty input path
+- confirm voltage-sense output scaling and ADC clamp values
+- confirm motor thermistor scaling
+- confirm isolated 12V source and OPA4388 symbol pin mapping before fab

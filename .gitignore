@@ -1,0 +1,38 @@
+# Altium local caches / generated artifacts (regenerate on open)
+__Previews/
+History/
+Project Logs*/
+Project Outputs*/
+
+# Office lock files
+~$*
+
+# OS cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local editor / tool state
+.claude/
+.codex/
+.vercel/
+
+# Bulk archive material kept locally, not in git history
+SURG/drive-download-*.zip
+project_archive/**/drive-download-*.zip
+SURG_Proposal_Cost_and_Energy_Efficiency_of_FPGA_Based_FOC.pdf
+RAM Chart.xlsx
+SURG Gantt Chart.xlsx
+
+# Node dependencies (Vercel installs these from package.json)
+node_modules/
+.env
+.env.local
+
+# Vivado/xsim generated artifacts
+fpga/**/xsim.dir/
+fpga/**/*.wdb
+fpga/**/*.pb
+fpga/**/*.dcp
+fpga/**/*.jou
+fpga/**/*backup.log

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560" role="img" aria-labelledby="title desc">
+  <title id="title">Arty Z7 control stack for FPGA FOC</title>
+  <desc id="desc">Diagram showing Arty Z7 Zynq processing system, AXI registers, FPGA fabric, Arduino-style header, and high-voltage motor-driver PCB.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28384d"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .board { fill: #ffffff; stroke: #28384d; stroke-width: 2.2; rx: 8; }
+      .ps { fill: #eaf0ff; stroke: #315fba; stroke-width: 2; rx: 8; }
+      .pl { fill: #e7f4ee; stroke: #1f7a55; stroke-width: 2; rx: 8; }
+      .axi { fill: #f4ecff; stroke: #6f42c1; stroke-width: 2; rx: 8; }
+      .hdr { fill: #fff1e6; stroke: #b85c15; stroke-width: 2; rx: 8; }
+      .hv { fill: #ffecec; stroke: #b42318; stroke-width: 2; rx: 8; }
+      .label { font: 700 20px Arial, sans-serif; fill: #162033; }
+      .text { font: 15px Arial, sans-serif; fill: #28384d; }
+      .small { font: 13px Arial, sans-serif; fill: #40526b; }
+      .flow { fill: none; stroke: #28384d; stroke-width: 2.4; marker-end: url(#arrow); }
+      .fast { fill: none; stroke: #1f7a55; stroke-width: 3; marker-end: url(#arrow); }
+      .fault { fill: none; stroke: #b42318; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect class="bg" width="1180" height="560"/>
+  <text class="label" x="34" y="46">Arty Z7 / Zynq control-board direction</text>
+  <text class="small" x="34" y="72">Treat Arduino-header signals as 3.3 V-safe unless the final interface proves otherwise.</text>
+
+  <rect class="board" x="48" y="112" width="700" height="360"/>
+  <text class="label" x="78" y="148">Arty Z7 / Zynq-7000 SoC board</text>
+
+  <rect class="ps" x="86" y="186" width="230" height="190"/>
+  <text class="label" x="114" y="224">ARM PS</text>
+  <text class="text" x="114" y="256">Setup / modes</text>
+  <text class="text" x="114" y="281">CAN + logging</text>
+  <text class="text" x="114" y="306">Calibration</text>
+  <text class="text" x="114" y="331">Recovery / re-enable</text>
+
+  <rect class="axi" x="370" y="220" width="165" height="120"/>
+  <text class="label" x="403" y="258">AXI regs</text>
+  <text class="text" x="397" y="287">Iq, mode, enable</text>
+  <text class="text" x="397" y="312">faults, Hall, data</text>
+
+  <rect class="pl" x="585" y="168" width="130" height="225"/>
+  <text class="label" x="619" y="207">FPGA</text>
+  <text class="text" x="611" y="240">PWM</text>
+  <text class="text" x="611" y="265">Hall capture</text>
+  <text class="text" x="611" y="290">FOC blocks</text>
+  <text class="text" x="611" y="315">Fault disable</text>
+  <text class="text" x="611" y="340">ADC timing</text>
+
+  <rect class="hdr" x="805" y="165" width="135" height="230"/>
+  <text class="label" x="835" y="203">Header</text>
+  <text class="text" x="830" y="238">PWM</text>
+  <text class="text" x="830" y="263">ENABLE</text>
+  <text class="text" x="830" y="288">nFAULT</text>
+  <text class="text" x="830" y="313">Hall A/B/C</text>
+  <text class="text" x="830" y="338">Current/ADC</text>
+
+  <rect class="hv" x="990" y="154" width="150" height="252"/>
+  <text class="label" x="1012" y="192">HV driver</text>
+  <text class="text" x="1013" y="228">Gate driver</text>
+  <text class="text" x="1013" y="253">Power bridge</text>
+  <text class="text" x="1013" y="278">Sensors</text>
+  <text class="text" x="1013" y="303">Protection</text>
+  <text class="text" x="1013" y="328">Motor phases</text>
+
+  <path class="flow" d="M316 280 H370"/>
+  <path class="flow" d="M535 280 H585"/>
+  <path class="fast" d="M715 252 H805"/>
+  <path class="fast" d="M940 252 H990"/>
+  <path class="fault" d="M990 336 H940"/>
+  <path class="fault" d="M805 336 H715"/>
+  <path class="flow" d="M650 393 V430 H202 V376"/>
+
+  <text class="small" x="332" y="260">shared registers</text>
+  <text class="small" x="752" y="235">3PWM or 6PWM</text>
+  <text class="small" x="950" y="235">3.3 V-safe interface</text>
+  <text class="small" x="762" y="364">fault/current feedback</text>
+  <text class="small" x="254" y="430">telemetry and recovery policy return to ARM</text>
+</svg>

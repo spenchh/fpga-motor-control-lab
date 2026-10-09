@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="520" viewBox="0 0 1180 520" role="img" aria-labelledby="title desc">
+  <title id="title">Gate driver voltage classes for low-voltage and 96 V inverter work</title>
+  <desc id="desc">Comparison chart showing DRV8320 at 6 to 60 V, DRV8353M at 9 to 100 V, and isolated gate-driver direction for higher voltage margin.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .axis { stroke: #28384d; stroke-width: 2; }
+      .tick { stroke: #40526b; stroke-width: 1.5; }
+      .label { font: 700 20px Arial, sans-serif; fill: #162033; }
+      .text { font: 15px Arial, sans-serif; fill: #28384d; }
+      .small { font: 13px Arial, sans-serif; fill: #40526b; }
+      .drv8320 { fill: #8ecae6; stroke: #17617a; stroke-width: 2; rx: 8; }
+      .drv8353 { fill: #a7d7b8; stroke: #1f7a55; stroke-width: 2; rx: 8; }
+      .isolated { fill: #f7c59f; stroke: #b85c15; stroke-width: 2; rx: 8; }
+      .target { stroke: #b42318; stroke-width: 3; stroke-dasharray: 7 7; }
+      .note { fill: #fff; stroke: #b42318; stroke-width: 2; rx: 8; }
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1180" height="520"/>
+  <text class="label" x="34" y="46">Gate-driver voltage class check</text>
+  <text class="small" x="34" y="72">The 96 V target sits too close to 100 V-class parts unless transients are tightly bounded.</text>
+
+  <line class="axis" x1="105" y1="400" x2="1085" y2="400"/>
+  <text class="small" x="98" y="430">0 V</text>
+  <text class="small" x="358" y="430">60 V</text>
+  <text class="small" x="548" y="430">96 V</text>
+  <text class="small" x="604" y="430">100 V</text>
+  <text class="small" x="1050" y="430">HV</text>
+  <line class="tick" x1="105" y1="390" x2="105" y2="410"/>
+  <line class="tick" x1="385" y1="390" x2="385" y2="410"/>
+  <line class="tick" x1="553" y1="390" x2="553" y2="410"/>
+  <line class="tick" x1="572" y1="390" x2="572" y2="410"/>
+  <line class="tick" x1="1085" y1="390" x2="1085" y2="410"/>
+  <line class="target" x1="553" y1="92" x2="553" y2="404"/>
+
+  <rect class="drv8320" x="133" y="126" width="252" height="62"/>
+  <text class="label" x="156" y="163">DRV8320: 6-60 V</text>
+  <text class="small" x="156" y="185">Low-voltage SimpleFOC-class bring-up</text>
+
+  <rect class="drv8353" x="147" y="225" width="425" height="62"/>
+  <text class="label" x="170" y="262">DRV8353M: 9-100 V</text>
+  <text class="small" x="170" y="284">Closer to 96 V, but transient margin is thin</text>
+
+  <rect class="isolated" x="520" y="324" width="520" height="62"/>
+  <text class="label" x="543" y="361">Isolated gate-driver path</text>
+  <text class="small" x="543" y="383">UCC21550 half-bridge, UCC21750 SiC/IGBT with DESAT</text>
+
+  <rect class="note" x="620" y="96" width="430" height="126"/>
+  <text class="label" x="644" y="132">Design implication</text>
+  <text class="text" x="644" y="162">Do not scale DRV8320 hardware to 96 V.</text>
+  <text class="text" x="644" y="187">At 96 V nominal, verify surge, regen,</text>
+  <text class="text" x="644" y="212">layout, and device abs max before PCB lock.</text>
+
+  <text class="small" x="566" y="90">96 V nominal target</text>
+</svg>

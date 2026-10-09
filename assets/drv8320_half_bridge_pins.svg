@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560" role="img" aria-labelledby="title desc">
+  <title id="title">DRV8320 phase-A half-bridge pin meanings</title>
+  <desc id="desc">Simplified phase-A half-bridge showing VM and VDRAIN tied to the motor bus, GHA driving the high-side gate, SHA as the switch node and high-side source, GLA driving the low-side gate, and SLA sensing the low-side source.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28384d"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .chip { fill: #eaf0ff; stroke: #315fba; stroke-width: 2; rx: 8; }
+      .mos { fill: #ffffff; stroke: #28384d; stroke-width: 2; rx: 6; }
+      .bus { stroke: #b42318; stroke-width: 4; }
+      .node { fill: #fff1e6; stroke: #b85c15; stroke-width: 2; }
+      .ground { stroke: #28384d; stroke-width: 2; }
+      .wire { fill: none; stroke: #28384d; stroke-width: 2.4; marker-end: url(#arrow); }
+      .plain { fill: none; stroke: #28384d; stroke-width: 2.4; }
+      .sense { fill: none; stroke: #1f7a55; stroke-width: 2.6; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .label { font: 700 20px Arial, sans-serif; fill: #162033; }
+      .text { font: 15px Arial, sans-serif; fill: #28384d; }
+      .small { font: 13px Arial, sans-serif; fill: #40526b; }
+      .pin { font: 700 15px Arial, sans-serif; fill: #315fba; }
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1180" height="560"/>
+  <text class="label" x="34" y="46">DRV8320 phase-A half-bridge pins</text>
+  <text class="small" x="34" y="72">`SHA` is the moving switch node. `VM` is a power input from the motor bus.</text>
+
+  <rect class="chip" x="70" y="128" width="260" height="300"/>
+  <text class="label" x="103" y="165">DRV8320</text>
+  <text class="pin" x="262" y="215">VM</text>
+  <text class="pin" x="250" y="252">VDRAIN</text>
+  <text class="pin" x="260" y="294">GHA</text>
+  <text class="pin" x="260" y="336">SHA</text>
+  <text class="pin" x="260" y="378">GLA</text>
+  <text class="pin" x="260" y="420">SLA</text>
+
+  <line class="bus" x1="440" y1="135" x2="1040" y2="135"/>
+  <text class="label" x="454" y="116">Motor bus +</text>
+  <line class="ground" x1="440" y1="465" x2="1040" y2="465"/>
+  <text class="label" x="454" y="498">Power ground</text>
+
+  <rect class="mos" x="700" y="175" width="120" height="85"/>
+  <text class="label" x="724" y="211">High</text>
+  <text class="small" x="720" y="236">MOSFET</text>
+  <rect class="mos" x="700" y="340" width="120" height="85"/>
+  <text class="label" x="732" y="376">Low</text>
+  <text class="small" x="720" y="401">MOSFET</text>
+
+  <line class="plain" x1="760" y1="135" x2="760" y2="175"/>
+  <circle class="node" cx="760" cy="300" r="16"/>
+  <line class="plain" x1="760" y1="260" x2="760" y2="284"/>
+  <line class="plain" x1="760" y1="316" x2="760" y2="340"/>
+  <line class="plain" x1="760" y1="425" x2="760" y2="465"/>
+  <line class="plain" x1="776" y1="300" x2="1000" y2="300"/>
+  <text class="label" x="1012" y="307">Phase A</text>
+
+  <path class="plain" d="M330 210 H520 V135 H760"/>
+  <path class="plain" d="M330 248 H560 V135"/>
+  <path class="wire" d="M330 290 H680"/>
+  <path class="wire" d="M330 374 H680"/>
+  <path class="plain" d="M330 334 H744"/>
+  <path class="plain" d="M330 418 H700"/>
+
+  <path class="sense" d="M760 300 C650 295 560 330 330 334"/>
+  <path class="sense" d="M760 465 C650 468 530 438 330 418"/>
+
+  <text class="small" x="535" y="218">GHA drives high-side gate</text>
+  <text class="small" x="536" y="386">GLA drives low-side gate</text>
+  <text class="small" x="805" y="285">SHA = high-side source + switch node</text>
+  <text class="small" x="805" y="330">Voltage swings with PWM phase output</text>
+  <text class="small" x="793" y="449">SLA = low-side source sense input</text>
+  <text class="small" x="470" y="151">VM/VDRAIN tie to motor supply for power and VDS sensing</text>
+</svg>
