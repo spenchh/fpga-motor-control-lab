@@ -23,6 +23,5 @@ SimpleFOC-DriveShield-main/
 
 # Source that isn't part of the site
 fpga/
-matlab/
 arduino/
 *.zip

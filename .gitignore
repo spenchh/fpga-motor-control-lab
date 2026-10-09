@@ -36,3 +36,5 @@ fpga/**/*.pb
 fpga/**/*.dcp
 fpga/**/*.jou
 fpga/**/*backup.log
+
+.vercel
