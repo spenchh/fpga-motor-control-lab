@@ -1,0 +1,38 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Sat Aug 22 02:08:23 2026
+| Host         : Spench running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file <project>/fpga/synth_foc_wrapper_pipelined_out/post_route_utilization_hierarchical.rpt
+| Design       : foc_synth_wrapper
+| Device       : xc7z010clg400-1
+| Speed File   : -1
+| Design State : Routed
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-----------------------+---------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|        Instance       |           Module          | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++-----------------------+---------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| foc_synth_wrapper     |                     (top) |       1292 |       1292 |       0 |    0 | 668 |      0 |      0 |         20 |
+|   (foc_synth_wrapper) |                     (top) |         39 |         39 |       0 |    0 |  40 |      0 |      0 |          0 |
+|   dut                 |      foc_current_loop_top |       1253 |       1253 |       0 |    0 | 628 |      0 |      0 |         20 |
+|     q_axis_pi         |       pi_controller_q15_0 |         87 |         87 |       0 |    0 |  68 |      0 |      0 |          2 |
+|     clarke_park       |     clarke_park_transform |        114 |        114 |       0 |    0 |  36 |      0 |      0 |          5 |
+|     current_scaler    |    adc_current_scaler_q15 |        366 |        366 |       0 |    0 |  51 |      0 |      0 |          3 |
+|     d_axis_pi         |         pi_controller_q15 |        230 |        230 |       0 |    0 |  96 |      0 |      0 |          2 |
+|     duty_generator    |        alpha_beta_to_duty |        166 |        166 |       0 |    0 |  99 |      0 |      0 |          4 |
+|     inverse_park      |    inverse_park_transform |        117 |        117 |       0 |    0 |  18 |      0 |      0 |          4 |
+|     pwm_generator     | pwm_3phase_center_aligned |        191 |        191 |       0 |    0 | 184 |      0 |      0 |          0 |
++-----------------------+---------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

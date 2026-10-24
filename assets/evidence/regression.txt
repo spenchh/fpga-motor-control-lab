@@ -1,0 +1,32 @@
+Icarus SystemVerilog directed regression
+Source commit: 403730d5a780dc507cf42e4a531a077aca57214a
+Checked: 2026-10-23
+Command: python rtl/sim/run_tests.py
+
+Starting ADC current scaler testbench
+PASS: ADC current scaler testbench completed
+Starting alpha/beta to duty testbench
+PASS: alpha/beta to duty testbench completed
+Starting Clarke/Park transform testbench
+PASS: Clarke/Park transform testbench completed
+Starting FOC current loop top testbench
+PASS: FOC current loop top testbench completed
+Starting Hall decoder testbench
+PASS: Hall decoder testbench completed
+Starting inverse Park transform testbench
+PASS: inverse Park transform testbench completed
+Starting PCB disable control testbench
+PASS: PCB disable control testbench completed
+Starting phase current balance monitor testbench
+PASS: phase current balance monitor testbench completed
+Starting phase current limit monitor testbench
+PASS: phase current limit monitor testbench completed
+Starting PI controller testbench
+PASS: PI controller testbench completed
+Starting 3PWM testbench
+PASS: 3PWM testbench completed
+Starting sin/cos LUT testbench
+PASS: sin/cos LUT testbench completed
+Starting voltage sense monitor testbench
+PASS: voltage sense monitor testbench completed
+13/13 testbenches passed

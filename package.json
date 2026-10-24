@@ -5,10 +5,10 @@
   "type": "module",
   "description": "SURG 2026 FPGA motor-controller project documentation site and assistant",
   "scripts": {
-    "kb": "node tools/build-kb.mjs",
-    "test": "node tools/test-assistant.mjs",
+    "sources": "node tools/sync-sources.mjs",
+    "test": "node tools/check-docs.mjs",
     "dev": "node tools/serve.mjs",
-    "check": "node tools/test-assistant.mjs"
+    "check": "node tools/check-docs.mjs"
   },
   "dependencies": {
     "ai": "^7.0.55"

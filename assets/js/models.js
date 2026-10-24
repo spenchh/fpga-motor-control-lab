@@ -1,0 +1,67 @@
+/* Interactive figures use the documented equations; they are not simulator traces. */
+window.LabModels = (() => {
+  const active = new Set();
+  const tau = Math.PI * 2;
+  const val = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  function mount(host, name) {
+    const cv = document.createElement('canvas');
+    cv.setAttribute('role','img'); cv.setAttribute('aria-label',`${name} engineering diagram`);
+    host.append(cv);
+    const controls = document.createElement('div'); controls.className='model-controls';
+    const out = document.createElement('div'); out.className='readout'; out.setAttribute('aria-live','polite');
+    let draw = () => {};
+    function range(label,min,max,initial,step=1) {
+      const wrap=document.createElement('label');
+      const text=document.createElement('span'); text.textContent=label;
+      const input=document.createElement('input');input.type='range';input.min=min;input.max=max;input.step=step;input.value=initial;input.setAttribute('aria-label',label);
+      wrap.append(text,input);controls.append(wrap);input.addEventListener('input',()=>draw());return input;
+    }
+    function button(label,fn){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',fn);controls.append(b);return b;}
+    function begin(height=300){const w=Math.max(270,host.clientWidth);const dpr=Math.min(devicePixelRatio||1,2);cv.width=w*dpr;cv.height=height*dpr;cv.style.height=`${height}px`;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.fillStyle=val('--paper');c.fillRect(0,0,w,height);c.font='12px Segoe UI, Arial';c.lineWidth=1;return {c,w,h:height};}
+    const text=(c,s,x,y,color='--muted',align='left',size=12)=>{c.fillStyle=val(color);c.font=`${size}px Segoe UI, Arial`;c.textAlign=align;c.fillText(s,x,y);};
+    const line=(c,x1,y1,x2,y2,color='--line',width=1)=>{c.strokeStyle=val(color);c.lineWidth=width;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();};
+    function arrow(c,x,y,dx,dy,color){line(c,x,y,x+dx,y+dy,color,2.5);const a=Math.atan2(dy,dx);line(c,x+dx,y+dy,x+dx-8*Math.cos(a-.45),y+dy-8*Math.sin(a-.45),color,2);line(c,x+dx,y+dy,x+dx-8*Math.cos(a+.45),y+dy-8*Math.sin(a+.45),color,2);}
+    function axis(c,w,h,lo=-1,hi=1){const left=42,right=w-20,top=42,bottom=h-38;for(let i=0;i<5;i++){let y=top+(bottom-top)*i/4;line(c,left,y,right,y);text(c,(hi-(hi-lo)*i/4).toFixed(1),left-9,y+4,'--muted','right',10);}line(c,left,top,left,bottom);return {x:t=>left+t*(right-left),y:v=>bottom-(v-lo)/(hi-lo)*(bottom-top),left,right,top,bottom};}
+    function curve(c,a,fn,color,steps=240){c.strokeStyle=val(color);c.lineWidth=2;c.beginPath();for(let i=0;i<=steps;i++){const x=a.x(i/steps),y=a.y(fn(i/steps));i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}
+    const read = entries => {out.replaceChildren(...entries.map(([k,v])=>{const s=document.createElement('span');s.textContent=`${k} ${v}`;return s;}));};
+    if(name==='system') {
+      draw=()=>{const {c,w}=begin(310);const labels=[['Current samples','3 × 12-bit ADC'],['FOC datapath','scale → dq → PI'],['Duty / PWM','3 phase commands'],['Gate drivers','6 HI/LO signals'],['Inverter','3 switching legs'],['Motor','current feedback']];const cols=w<490?2:3,bw=(w-48-(cols-1)*16)/cols,bh=66;labels.forEach((s,i)=>{const col=i%cols,row=Math.floor(i/cols),x=24+col*(bw+16),y=30+row*90;c.fillStyle=i===1?val('--accent-soft'):val('--soft');c.fillRect(x,y,bw,bh);c.strokeStyle=val('--line');c.strokeRect(x,y,bw,bh);text(c,s[0],x+12,y+26,'--ink','left',w<390?11:12);text(c,s[1],x+12,y+46,'--muted','left',10);if(col<cols-1)arrow(c,x+bw+2,y+33,12,0,'--accent');});if(cols===3){text(c,'Angle + references + calibrated limits → FOC',24,250,'--accent');text(c,'Current + balance faults → latched DISABLE → gates off',24,274,'--muted','left',w<600?10:12);}read([['Input','current + angle'],['Output','duty + enable']]);};
+    } else if(name==='motor') {
+      const angle=range('Electrical angle (degrees)',0,360,35);const poles=range('Illustrative pole pairs',1,16,4);
+      draw=()=>{const {c,w}=begin(320),cx=w/2,cy=144,r=95;c.strokeStyle=val('--line');c.lineWidth=12;c.beginPath();c.arc(cx,cy,r,0,tau);c.stroke();['A','B','C'].forEach((s,i)=>{const a=-i*tau/3;line(c,cx,cy,cx+Math.cos(a)*r,cy+Math.sin(a)*r,['--accent','--blue','--red'][i],2);text(c,s,cx+Math.cos(a)*(r+19),cy+Math.sin(a)*(r+19)+4,['--accent','--blue','--red'][i],'center',14);});const a=-Number(angle.value)*Math.PI/180;c.save();c.translate(cx,cy);c.rotate(a);c.fillStyle=val('--accent');c.fillRect(0,-18,64,36);c.fillStyle=val('--red');c.fillRect(-64,-18,64,36);c.restore();text(c,'Stator winding axes',w/2,280,'--muted','center');read([['θ electrical',`${angle.value}°`],['θ mechanical',`${(+angle.value/+poles.value).toFixed(2)}°`]]);};
+    } else if(name==='phases') {
+      const angle=range('Sample angle (degrees)',0,360,60);
+      draw=()=>{const {c,w,h}=begin(),a=axis(c,w,h);['--accent','--blue','--red'].forEach((color,i)=>curve(c,a,t=>Math.sin(t*tau-i*tau/3),color));const t=+angle.value/360;line(c,a.x(t),a.top,a.x(t),a.bottom,'--ink');text(c,'A',a.left,20,'--accent');text(c,'B',a.left+35,20,'--blue');text(c,'C',a.left+70,20,'--red');text(c,'one electrical cycle →',w-20,h-10,'--muted','right',10);read(['A','B','C'].map((n,i)=>[n,Math.sin(t*tau-i*tau/3).toFixed(3)]));};
+    } else if(name==='transform') {
+      const vector=range('Current vector angle (degrees)',0,360,55);const frame=range('Rotor / d-axis angle (degrees)',0,360,25);const magnitude=range('Vector magnitude (per unit)',0,1,.75,.01);
+      draw=()=>{const {c,w}=begin(310),cx=w/2,cy=140,r=95;line(c,cx-r-20,cy,cx+r+20,cy);line(c,cx,cy-r-15,cx,cy+r+15);text(c,'α',cx+r+28,cy+5);text(c,'β',cx+7,cy-r-14);c.strokeStyle=val('--line');c.beginPath();c.arc(cx,cy,r,0,tau);c.stroke();const t=+frame.value*Math.PI/180,v=+vector.value*Math.PI/180,m=+magnitude.value;arrow(c,cx,cy,Math.cos(t)*r,-Math.sin(t)*r,'--blue');arrow(c,cx,cy,-Math.sin(t)*r,-Math.cos(t)*r,'--red');text(c,'d',cx+Math.cos(t)*(r+14),cy-Math.sin(t)*(r+14),'--blue','center');text(c,'q',cx-Math.sin(t)*(r+14),cy-Math.cos(t)*(r+14),'--red','center');arrow(c,cx,cy,Math.cos(v)*r*m,-Math.sin(v)*r*m,'--accent');text(c,'same vector · rotating axes',w/2,285,'--muted','center');read([['α',(m*Math.cos(v)).toFixed(3)],['β',(m*Math.sin(v)).toFixed(3)],['d',(m*Math.cos(v-t)).toFixed(3)],['q',(m*Math.sin(v-t)).toFixed(3)]]);};
+    } else if(name==='fixed') {
+      const value=range('Normalized value',-1.5,1.5,.5,.01);
+      draw=()=>{const {c,w}=begin(205);const raw=Math.round(+value.value*32768),n=Math.max(-32768,Math.min(32767,raw)),hex=(n&65535).toString(16).toUpperCase().padStart(4,'0');text(c,'SIGNED Q1.15',24,28,'--muted','left',11);text(c,`${(+value.value).toFixed(2)} × 32768`,24,72,'--ink','left',22);text(c,`= ${raw} → ${n}`,24,106,raw!==n?'--red':'--accent','left',22);const bits=(n&65535).toString(2).padStart(16,'0'),bw=Math.min(28,(w-48)/16);for(let i=0;i<16;i++){c.fillStyle=i===0?val('--accent-soft'):val('--soft');c.fillRect(24+i*bw,135,bw-2,30);text(c,bits[i],24+i*bw+bw/2-1,155,i===0?'--accent':'--ink','center',12);}read([['Hex',`0x${hex}`],['Decoded',(n/32768).toFixed(6)],['Clipped',raw!==n?'yes':'no']]);};
+    } else if(name==='pi') {
+      const error=range('Constant error',-.5,.5,.125,.025),kp=range('Kp',0,.99,.5,.01),ki=range('Ki per update',0,.5,.25,.01);let samples=4;
+      button('Next sample',()=>{samples=Math.min(samples+1,32);draw();});button('Clear history',()=>{samples=1;draw();});
+      draw=()=>{const {c,w,h}=begin(),a=axis(c,w,h,-1,1),p=+error.value*+kp.value;let integral=0;const history=[];for(let k=0;k<samples;k++){integral=Math.max(-.49,Math.min(.49,integral+(+error.value*+ki.value)));history.push(Math.max(-.49,Math.min(.49,p+integral)));}curve(c,a,t=>history[Math.min(history.length-1,Math.floor(t*history.length))],'--accent',Math.max(50,samples*5));line(c,a.left,a.y(.49),a.right,a.y(.49),'--red');line(c,a.left,a.y(-.49),a.right,a.y(-.49),'--red');text(c,'PI output vs accepted updates',a.left,20,'--accent');read([['Samples',samples],['P',p.toFixed(4)],['I',integral.toFixed(4)],['Output',history.at(-1).toFixed(4)]]);};
+    } else if(name==='partition') {
+      draw=()=>{const {c,w}=begin(300);const pad=22,bw=(w-pad*3)/2;[['ARM / PS','Proposed integration','Configuration','Modes + calibration','CAN + logs'],['FPGA / PL','Implemented datapath','Current transforms','PI + PWM timing','Fault gating']].forEach((s,i)=>{let x=pad+i*(bw+pad);c.fillStyle=i?val('--accent-soft'):val('--soft');c.fillRect(x,26,bw,220);text(c,s[0],x+14,56,'--ink','left',16);text(c,s[1],x+14,80,'--muted','left',w<430?9:11);for(let j=2;j<s.length;j++)text(c,s[j],x+14,114+(j-2)*34,i?'--accent':'--muted','left',w<430?10:12);});text(c,'Proposed AXI registers: references, gains, limits ↔ status',w/2,280,'--muted','center',w<490?9:12);};
+    } else if(name==='pipeline') {
+      let cycle=0;const steps=[['ADC subtract',0],['ADC multiply',1],['Current output',2],['Valid handoff',3],['Clarke capture',4],['Clarke multiply',5],['Park products',6],['dq output',7],['PI error',8],['PI products',9],['Integrator / P',10],['PI output',11],['Valid handoff',12],['Inverse products',13],['αβ output',14],['Valid handoff',15],['Phase products',16],['Phase sums',17],['Duty result',18]];
+      const progress=range('Clock edge E',0,18,0);button('Next clock',()=>{progress.value=Math.min(18,+progress.value+1);draw();});button('Reset',()=>{progress.value=0;draw();});
+      draw=()=>{cycle=+progress.value;const {c,w}=begin(285);text(c,`E${cycle} / 18`,24,40,'--accent','left',24);text(c,steps[cycle][0],24,78,'--ink','left',18);const box=(w-48)/19;steps.forEach((s,i)=>{c.fillStyle=i<=cycle?val('--accent'):val('--line');c.fillRect(24+i*box,112,Math.max(3,box-3),36);if(i%3===0)text(c,i,24+i*box,170,'--muted','center',10);});text(c,'Source-derived isolated-sample trace',24,218,'--muted','left',12);text(c,'Assumes data is held stable at valid handoffs.',24,242,'--muted','left',w<430?10:12);read([['Edge',`E${cycle}`],['Elapsed at 100 MHz',`${cycle*10} ns`]]);};
+    } else if(name==='pwm') {
+      const duty=range('Phase duty (%)',0,100,60),period=range('Timer peak',10,100,40),gap=range('Non-overlap setting',0,8,2);let inhibit=false;
+      const toggle=button('Inhibit outputs',()=>{inhibit=!inhibit;toggle.textContent=inhibit?'Enable outputs':'Inhibit outputs';draw();});
+      draw=()=>{const {c,w}=begin(330),left=40,right=w-18,top=52;const p=+period.value,d=Math.round(p*+duty.value/100),g=+gap.value;for(let i=0;i<=4;i++){const y=top+i*25;line(c,left,y,right,y);}const points=4*p;c.strokeStyle=val('--blue');c.lineWidth=2;c.beginPath();for(let i=0;i<=points;i++){let k=i%(2*p),count=k<=p?k:2*p-k;let x=left+i/points*(right-left),y=top+100-count/p*100;i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();line(c,left,top+100-d/p*100,right,top+100-d/p*100,'--accent');for(let side=0;side<2;side++){const y=side?270:210;c.strokeStyle=val(side?'--red':'--accent');c.lineWidth=2;c.beginPath();for(let i=0;i<=points;i++){let k=i%(2*p),n=k<=p?k:2*p-k;const high=!inhibit&&(side?n>d+g:n+g<d),x=left+i/points*(right-left),v=y-(high?27:0);i?c.lineTo(x,v):c.moveTo(x,v);}c.stroke();text(c,side?'LO':'HI',12,y-10,side?'--red':'--accent','left',10);}text(c,'counter',left,25,'--blue');text(c,'duty threshold',left+78,25,'--accent');read([['Period',p],['Duty counts',d],['Gap ticks',g],['Inhibited',inhibit?'yes':'no']]);};
+    } else if(name==='fault') {
+      let ready=false,trip=false,latched=false;const clear=button('Clear latch',()=>{if(!trip)latched=false;draw();});button('Sensors ready',()=>{ready=true;draw();});const fault=button('Inject overcurrent',()=>{trip=!trip;if(trip)latched=true;fault.textContent=trip?'Remove overcurrent':'Inject overcurrent';draw();});button('Reset',()=>{ready=false;trip=false;latched=false;fault.textContent='Inject overcurrent';draw();});
+      draw=()=>{const {c,w}=begin(210),run=ready&&!trip&&!latched;clear.disabled=!latched||trip;text(c,run?'RUN':!ready?'STARTUP INHIBIT':'PROTECTION LATCHED',24,48,run?'--accent':'--red','left',w<390?18:22);const labels=[['Sensor ready',ready],['Current fault',trip],['Latch',latched],['PWM enabled',run]];labels.forEach((s,i)=>{let x=24+(i%2)*(w-48)/2,y=92+Math.floor(i/2)*40;c.fillStyle=s[1]?val('--accent'):val('--line');c.beginPath();c.arc(x+5,y-4,4,0,tau);c.fill();text(c,s[0],x+18,y,'--muted','left',12);});read([['DISABLE',run?'0':'1'],['State',run?'run':'inhibit']]);};
+    } else if(name==='timing') {
+      draw=()=>{const {c,w}=begin(230),x=105,len=w-140;const zero=x+len*.43;line(c,zero,34,zero,190,'--ink');text(c,'0 ns',zero,213,'--muted','center',10);[['Original',-.335,'--red'],['Pipelined',.557,'--accent']].forEach(([s,v,col],i)=>{const y=67+i*78;let end=zero+v*len*.7;c.fillStyle=val(col);c.fillRect(Math.min(zero,end),y,Math.abs(end-zero),25);text(c,s,20,y+17,'--ink','left',12);text(c,`${v>0?'+':''}${v.toFixed(3)} ns`,v<0?end-7:end+7,y+18,col,v<0?'right':'left',w<400?10:12);});};
+    }
+    if(controls.childElementCount)host.append(controls);host.append(out);
+    const observer=new ResizeObserver(()=>draw());observer.observe(host);
+    const redraw=()=>draw();document.addEventListener('themechange',redraw);
+    active.add(()=>{observer.disconnect();document.removeEventListener('themechange',redraw);});draw();
+  }
+  return {mount,clear(){for(const dispose of active)dispose();active.clear();}};
+})();
