@@ -5,7 +5,7 @@
   const plain = html => {const d=document.createElement('div');d.innerHTML=html;return d.textContent.replace(/\s+/g,' ').trim();};
   const aliases={state:'overview',signals:'pcb',fpga:'rtl','fpga-pwm':'pwm','fpga-hall':'motor','fpga-safety':'protection','fpga-tb':'verification',matlab:'fixed','matlab-fixed':'fixed','matlab-clarke':'transforms','matlab-pi':'pi',vivado:'implementation',tools:'resources',links:'resources',glossary:'resources',questions:'architecture',timeline:'implementation','pcb-chips':'pcb','pcb-flags':'pcb'};
   const pages=LAB.pages;
-  let current='overview';
+  let current='home';
   let sourceMode='design';
   let selectedModule='adc_current_scaler_q15';
   let lineNotes=false;
@@ -102,12 +102,14 @@
   const times={adc_current_scaler_q15:166,alpha_beta_to_duty:166,clarke_park_transform:246,foc_current_loop_top:516,hall_decoder:136,inverse_park_transform:106,pcb_disable_control:196,phase_current_balance_monitor:4,phase_current_limit_monitor:3,pi_controller_q15:216,pwm_3phase_center_aligned:7115,sincos_lut_q15:160,voltage_sense_monitor:3};
   const checks={adc_current_scaler_q15:'Offset, sign, one-count change, gain change',alpha_beta_to_duty:'Zero and ±alpha duty vectors',clarke_park_transform:'0° / 90° projection, balance flag',foc_current_loop_top:'Enable, phase ordering, overcurrent latch',hall_decoder:'Legal sector, forward step, invalid state',inverse_park_transform:'0° and 90° rotation',pcb_disable_control:'Reset, startup, fault latch / clear',phase_current_balance_monitor:'Balance, edge, invalid-sample suppression',phase_current_limit_monitor:'Magnitude and valid gating',pi_controller_q15:'Accumulation, positive clamp, clear',pwm_3phase_center_aligned:'Non-overlap, strobes, inhibit, invalid config',sincos_lut_q15:'Axes and diagonal angles',voltage_sense_monitor:'Nominal, phase low, bus high'};
   function render(){
-    const parts=location.hash.replace(/^#\/?/,'').split('/');let id=aliases[parts[0]]||parts[0]||'overview';const page=pages.find(p=>p.id===id)||pages[0];current=page.id;
+    const parts=location.hash.replace(/^#\/?/,'').split('/');let id=aliases[parts[0]]||parts[0]||'home';const page=pages.find(p=>p.id===id)||pages[0];current=page.id;
     if(current==='rtl'&&LAB.modules[parts[1]])selectedModule=parts[1];
     LabModels.clear();
+    document.body.classList.toggle('is-home',!!page.home);
     const i=pages.indexOf(page);document.title=`${page.nav} | Motor Control Lab`;
     $('#chapter-meta').textContent=`${String(i+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')} · ${page.group}`;
-    $('#page').innerHTML=`<h1>${escape(page.title)}</h1><p class="lede">${escape(page.lede)}</p>${page.sections.map(s=>`<section aria-labelledby="${s.id}"><h2 id="${s.id}">${s.title}</h2>${s.body}</section>`).join('')}`;
+    const opening=page.home?`<div class="research-hero"><div data-model="research"></div><div class="research-hero-copy"><div class="research-kicker">Northwestern University · Summer Undergraduate Research</div><h1>FPGA Field-Oriented Control<br> <span>for Lightweight Motors</span></h1><p>${escape(page.lede)}</p><div class="research-actions"><a class="research-primary" href="#/overview">Explore the project <span aria-hidden="true">→</span></a><a href="#/home/research-question">Research question ↓</a></div></div><div class="research-figure-label">Electrical field · rotating reference frame</div></div><div class="research-byline"><span>Spencer Kogoma</span><span>Computer Engineering · SURG 2026</span><span>June–August 2026</span></div>`:`<h1>${escape(page.title)}</h1><p class="lede">${escape(page.lede)}</p>`;
+    $('#page').innerHTML=`${opening}<div class="${page.home?'research-body':'chapter-body'}">${page.sections.map(s=>`<section aria-labelledby="${s.id}"><h2 id="${s.id}">${s.title}</h2>${s.body}</section>`).join('')}</div>`;
     $('#toc').innerHTML=`<strong>On this page</strong>${page.sections.map(s=>`<a href="#/${page.id}/${s.id}">${s.title}</a>`).join('')}`;
     $('#pager').innerHTML=`${i?`<a href="#/${pages[i-1].id}"><small>PREVIOUS</small>← ${escape(pages[i-1].nav)}</a>`:'<span></span>'}${i<pages.length-1?`<a href="#/${pages[i+1].id}"><small>NEXT</small>${escape(pages[i+1].nav)} →</a>`:'<span></span>'}`;
     document.querySelectorAll('#navigation a').forEach(a=>{if(a.hash===`#/${page.id}`)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});

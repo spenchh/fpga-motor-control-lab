@@ -12,8 +12,9 @@ const output=resolve(__dirname,'../tmp/browser');mkdirSync(output,{recursive:tru
   const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base);await page.waitForSelector('#page h1');
+  assert.ok(await page.locator('body').evaluate(body=>body.classList.contains('is-home')));
   const chapters=await page.evaluate(()=>LabDocs.pages.map(p=>({id:p.id,title:p.title})));
-  for(const size of [{width:1440,height:1000},{width:390,height:844}]){
+  for(const size of [{width:1440,height:1000},{width:390,height:844},{width:320,height:667}]){
     await page.setViewportSize(size);
     for(const chapter of chapters){
       await page.goto(`${base}/#/${chapter.id}`);await page.waitForSelector('#page h1');
@@ -21,12 +22,20 @@ const output=resolve(__dirname,'../tmp/browser');mkdirSync(output,{recursive:tru
       assert.ok(!/short version for a meeting|professor update|what you should say/i.test(await page.locator('#page').innerText()));
       const dimensions=await page.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
       assert.ok(dimensions.scroll<=dimensions.width+1,`${chapter.id} overflow ${size.width}: ${JSON.stringify(dimensions)}`);
+      assert.deepEqual(await page.evaluate(()=>{const ids=[...document.querySelectorAll('[id]')].map(n=>n.id);return ids.filter((id,i)=>ids.indexOf(id)!==i);}),[],`${chapter.id}: duplicate IDs`);
       for(const canvas of await page.locator('#page canvas').all()){
         const colors=await canvas.evaluate(cv=>{const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data,s=new Set();for(let i=0;i<d.length;i+=64)s.add(`${d[i]},${d[i+1]},${d[i+2]}`);return s.size;});
         assert.ok(colors>4,`${chapter.id}: nonblank canvas`);
       }
     }
-    await page.goto(`${base}/#/overview`);await page.screenshot({path:resolve(output,`overview-${size.width}.png`),fullPage:true});
+    await page.goto(`${base}/#/home`);await page.screenshot({path:resolve(output,`home-${size.width}.png`),fullPage:true});
+    assert.ok(await page.locator('.research-mark').evaluate(img=>img.complete&&img.naturalWidth>0));
+    const hero=await page.locator('.research-hero').boundingBox();
+    const actions=await page.locator('.research-actions').boundingBox();
+    assert.ok(actions.y+actions.height<hero.y+hero.height-30,`Home actions clipped at ${size.width}`);
+    await page.getByRole('link',{name:'Explore the project',exact:false}).click();
+    assert.equal(await page.locator('#page h1').textContent(),chapters.find(c=>c.id==='overview').title);
+    await page.screenshot({path:resolve(output,`overview-${size.width}.png`),fullPage:true});
     await page.goto(`${base}/#/transforms`);await page.screenshot({path:resolve(output,`transforms-${size.width}.png`),fullPage:true});
   }
   await page.setViewportSize({width:1440,height:1000});
@@ -52,6 +61,6 @@ const output=resolve(__dirname,'../tmp/browser');mkdirSync(output,{recursive:tru
   await page.click('#theme-toggle');assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');await page.screenshot({path:resolve(output,'dark-desktop.png')});
   await page.setViewportSize({width:390,height:844});await page.click('#menu-toggle');assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'true');await page.locator('#navigation a[href="#/motor"]').click();assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false');
   assert.deepEqual(errors,[]);
-  writeFileSync(resolve(output,'results.json'),JSON.stringify({chapters:chapters.length,viewports:[1440,390],sourceFiles:27,browserErrors:errors,answers,status:'PASS'},null,2));
+  writeFileSync(resolve(output,'results.json'),JSON.stringify({chapters:chapters.length,viewports:[1440,390,320],sourceFiles:27,browserErrors:errors,answers,status:'PASS'},null,2));
   await browser.close();console.log(`PASS: ${chapters.length} chapters at desktop/mobile, canvas pixels, 13 source/test pairs, controls, search, answers, theme, and navigation.`);
 })().catch(e=>{console.error(e);process.exit(1);});

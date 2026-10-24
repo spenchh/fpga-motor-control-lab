@@ -24,7 +24,19 @@ window.LabModels = (() => {
     function axis(c,w,h,lo=-1,hi=1){const left=42,right=w-20,top=42,bottom=h-38;for(let i=0;i<5;i++){let y=top+(bottom-top)*i/4;line(c,left,y,right,y);text(c,(hi-(hi-lo)*i/4).toFixed(1),left-9,y+4,'--muted','right',10);}line(c,left,top,left,bottom);return {x:t=>left+t*(right-left),y:v=>bottom-(v-lo)/(hi-lo)*(bottom-top),left,right,top,bottom};}
     function curve(c,a,fn,color,steps=240){c.strokeStyle=val(color);c.lineWidth=2;c.beginPath();for(let i=0;i<=steps;i++){const x=a.x(i/steps),y=a.y(fn(i/steps));i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}
     const read = entries => {out.replaceChildren(...entries.map(([k,v])=>{const s=document.createElement('span');s.textContent=`${k} ${v}`;return s;}));};
-    if(name==='system') {
+    if(name==='research') {
+      cv.setAttribute('aria-label','Three motor winding axes and a rotating electrical field vector');
+      let phase=.62,frame=0;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      draw=()=>{const h=host.clientHeight||560;const {c,w}=begin(h);c.fillStyle='#14251e';c.fillRect(0,0,w,h);const mobile=w<=680,copy=host.parentElement.querySelector('.research-hero-copy'),contentBottom=copy.offsetTop+copy.offsetHeight,space=Math.max(90,h-contentBottom-42),cx=mobile?w/2:w*.81,cy=mobile?contentBottom+space/2+8:h*.47,r=mobile?Math.min(105,space*.4):Math.min(208,w*.18);c.lineWidth=1;
+        for(let ring=0;ring<4;ring++){c.strokeStyle=ring===2?'#567364':'#2d4639';c.beginPath();c.arc(cx,cy,r*(.45+ring*.2),0,tau);c.stroke();}
+        for(let i=0;i<24;i++){let a=i*tau/24;c.strokeStyle='#496353';c.beginPath();c.moveTo(cx+Math.cos(a)*r*.91,cy+Math.sin(a)*r*.91);c.lineTo(cx+Math.cos(a)*r*1.04,cy+Math.sin(a)*r*1.04);c.stroke();}
+        const colors=['#9be0b5','#82b4e0','#dfba73'];
+        for(let i=0;i<3;i++){const a=i*tau/3-.5*Math.PI;c.strokeStyle=colors[i];c.lineWidth=2;c.beginPath();c.moveTo(cx-Math.cos(a)*r*.95,cy-Math.sin(a)*r*.95);c.lineTo(cx+Math.cos(a)*r*.95,cy+Math.sin(a)*r*.95);c.stroke();c.lineWidth=6;c.beginPath();c.arc(cx,cy,r*.76,a-.2,a+.2);c.stroke();c.fillStyle=colors[i];c.font='11px Segoe UI';c.textAlign='center';c.fillText(['A','B','C'][i],cx+Math.cos(a)*r*1.17,cy+Math.sin(a)*r*1.17+4);}
+        const a=-phase,dx=Math.cos(a)*r*.7,dy=Math.sin(a)*r*.7;c.strokeStyle='#f1f8ef';c.lineWidth=2.5;c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+dx,cy+dy);c.stroke();c.beginPath();c.moveTo(cx+dx-11*Math.cos(a-.45),cy+dy-11*Math.sin(a-.45));c.lineTo(cx+dx,cy+dy);c.lineTo(cx+dx-11*Math.cos(a+.45),cy+dy-11*Math.sin(a+.45));c.stroke();c.fillStyle='#9be0b5';c.beginPath();c.arc(cx,cy,5,0,tau);c.fill();c.strokeStyle='#9be0b5';c.lineWidth=1;c.beginPath();c.arc(cx,cy,r*.3,a,0);c.stroke();
+        if(!mobile){const y0=h*.88,amp=18;for(let j=0;j<3;j++){c.strokeStyle=colors[j];c.lineWidth=1.2;c.beginPath();for(let i=0;i<=180;i++){const x=w*.62+i/180*w*.34,y=y0+Math.sin(i/180*tau*1.5-phase-j*tau/3)*amp;i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}}
+      };
+      const animate=()=>{phase+=.0025;draw();frame=requestAnimationFrame(animate);};if(!reduce)frame=requestAnimationFrame(animate);active.add(()=>cancelAnimationFrame(frame));
+    } else if(name==='system') {
       draw=()=>{const {c,w}=begin(310);const labels=[['Current samples','3 × 12-bit ADC'],['FOC datapath','scale → dq → PI'],['Duty / PWM','3 phase commands'],['Gate drivers','6 HI/LO signals'],['Inverter','3 switching legs'],['Motor','current feedback']];const cols=w<490?2:3,bw=(w-48-(cols-1)*16)/cols,bh=66;labels.forEach((s,i)=>{const col=i%cols,row=Math.floor(i/cols),x=24+col*(bw+16),y=30+row*90;c.fillStyle=i===1?val('--accent-soft'):val('--soft');c.fillRect(x,y,bw,bh);c.strokeStyle=val('--line');c.strokeRect(x,y,bw,bh);text(c,s[0],x+12,y+26,'--ink','left',w<390?11:12);text(c,s[1],x+12,y+46,'--muted','left',10);if(col<cols-1)arrow(c,x+bw+2,y+33,12,0,'--accent');});if(cols===3){text(c,'Angle + references + calibrated limits → FOC',24,250,'--accent');text(c,'Current + balance faults → latched DISABLE → gates off',24,274,'--muted','left',w<600?10:12);}read([['Input','current + angle'],['Output','duty + enable']]);};
     } else if(name==='motor') {
       const angle=range('Electrical angle (degrees)',0,360,35);const poles=range('Illustrative pole pairs',1,16,4);
@@ -58,7 +70,7 @@ window.LabModels = (() => {
     } else if(name==='timing') {
       draw=()=>{const {c,w}=begin(230),x=105,len=w-140;const zero=x+len*.43;line(c,zero,34,zero,190,'--ink');text(c,'0 ns',zero,213,'--muted','center',10);[['Original',-.335,'--red'],['Pipelined',.557,'--accent']].forEach(([s,v,col],i)=>{const y=67+i*78;let end=zero+v*len*.7;c.fillStyle=val(col);c.fillRect(Math.min(zero,end),y,Math.abs(end-zero),25);text(c,s,20,y+17,'--ink','left',12);text(c,`${v>0?'+':''}${v.toFixed(3)} ns`,v<0?end-7:end+7,y+18,col,v<0?'right':'left',w<400?10:12);});};
     }
-    if(controls.childElementCount)host.append(controls);host.append(out);
+    if(controls.childElementCount)host.append(controls);if(name!=='research')host.append(out);
     const observer=new ResizeObserver(()=>draw());observer.observe(host);
     const redraw=()=>draw();document.addEventListener('themechange',redraw);
     active.add(()=>{observer.disconnect();document.removeEventListener('themechange',redraw);});draw();
