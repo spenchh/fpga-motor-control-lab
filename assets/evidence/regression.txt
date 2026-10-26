@@ -1,7 +1,8 @@
 Icarus SystemVerilog directed regression
 Source commit: 403730d5a780dc507cf42e4a531a077aca57214a
-Checked: 2026-10-23
-Command: python rtl/sim/run_tests.py
+Checked: 2026-10-26
+Tool: Icarus Verilog version 12.0 (stable) ()
+Command: python3 rtl/sim/run_tests.py
 
 Starting ADC current scaler testbench
 PASS: ADC current scaler testbench completed

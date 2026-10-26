@@ -7,7 +7,7 @@ const {chromium}=load('playwright');
 const base=process.env.LAB_URL||'http://127.0.0.1:8795';
 const output=resolve(__dirname,'../tmp/browser');mkdirSync(output,{recursive:true});
 (async()=>{
-  const browser=await chromium.launch({headless:true,channel:'chrome'});
+  const browser=await chromium.launch({headless:true,...(process.env.LAB_BROWSER_PATH?{executablePath:process.env.LAB_BROWSER_PATH}:{channel:'chrome'}),args:['--no-sandbox','--disable-dev-shm-usage']});
   const errors=[];
   const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});
   page.on('pageerror',e=>errors.push(e.message));
@@ -34,11 +34,22 @@ const output=resolve(__dirname,'../tmp/browser');mkdirSync(output,{recursive:tru
     const actions=await page.locator('.research-actions').boundingBox();
     assert.ok(actions.y+actions.height<hero.y+hero.height-30,`Home actions clipped at ${size.width}`);
     await page.getByRole('link',{name:'Explore the project',exact:false}).click();
+    await page.waitForFunction(title=>document.querySelector('#page h1')?.textContent===title,chapters.find(c=>c.id==='overview').title);
     assert.equal(await page.locator('#page h1').textContent(),chapters.find(c=>c.id==='overview').title);
     await page.screenshot({path:resolve(output,`overview-${size.width}.png`),fullPage:true});
     await page.goto(`${base}/#/transforms`);await page.screenshot({path:resolve(output,`transforms-${size.width}.png`),fullPage:true});
   }
   await page.setViewportSize({width:1440,height:1000});
+  await page.goto(`${base}/#/study`);
+  const progress=page.locator('[data-study-key="physical"]');await progress.check();
+  await page.reload();assert.ok(await progress.isChecked());await progress.uncheck();
+  const explanation=page.locator('.study-check').first();await explanation.locator('summary').click();
+  assert.ok(await explanation.evaluate(el=>el.open));
+  await page.screenshot({path:resolve(output,'study-desktop.png'),fullPage:true});
+  await page.goto(`${base}/#/walkthrough`);assert.match(await page.locator('#page').innerText(),/527/);
+  await page.screenshot({path:resolve(output,'walkthrough-desktop.png'),fullPage:true});
+  await page.goto(`${base}/#/reproduce`);assert.match(await page.locator('#page').innerText(),/trace_test.py/);
+  await page.screenshot({path:resolve(output,'reproduce-desktop.png'),fullPage:true});
   await page.goto(`${base}/#/transforms`);assert.equal(await page.getByRole('slider',{name:'Vector magnitude (per unit)',exact:true}).inputValue(),'0.75');
   await page.goto(`${base}/#/pi`);assert.equal(await page.getByRole('slider',{name:'Constant error',exact:true}).inputValue(),'0.125');
   await page.goto(`${base}/#/rtl`);
@@ -57,9 +68,11 @@ const output=resolve(__dirname,'../tmp/browser');mkdirSync(output,{recursive:tru
   await page.click('#ask-toggle');await page.fill('#question','What changed to close timing?');await page.click('#chat-form button');await page.waitForFunction(()=>document.querySelector('#chat-form button').disabled===false);assert.match(await page.locator('.chat-answer').innerText(),/0\.557/);
   const answers=await page.evaluate(()=>['What motor is modeled?','What PWM frequency are we using?','Have any simulations passed?','Is Hall decoding integrated into the angle?','What are the inputs of adc_current_scaler_q15?'].map(q=>({q,...LabDocs.localAnswer(q)})));
   assert.match(answers[0].answer,/simulation parameters|simulation inputs/i);assert.match(answers[1].answer,/50 kHz/);assert.match(answers[2].answer,/13/);assert.match(answers[3].answer,/not connected/);assert.match(answers[4].answer,/adc_a/);
+  const learningAnswers=await page.evaluate(()=>['Where do I start with no prior knowledge?','How do I save a waveform?','Does a higher PWM frequency improve efficiency?'].map(q=>LabDocs.localAnswer(q)));
+  assert.equal(learningAnswers[0].page,'start');assert.equal(learningAnswers[1].page,'reproduce');assert.equal(learningAnswers[2].page,'decisions');
   await page.click('#ask-close');assert.ok(await page.locator('#assistant').isHidden());
   await page.click('#theme-toggle');assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');await page.screenshot({path:resolve(output,'dark-desktop.png')});
-  await page.setViewportSize({width:390,height:844});await page.click('#menu-toggle');assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'true');await page.locator('#navigation a[href="#/motor"]').click();assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false');
+  await page.setViewportSize({width:390,height:844});await page.click('#menu-toggle');assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'true');await page.locator('#navigation a[href="#/motor"]').click();await page.waitForFunction(()=>document.querySelector('#menu-toggle').getAttribute('aria-expanded')==='false');assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false');
   assert.deepEqual(errors,[]);
   writeFileSync(resolve(output,'results.json'),JSON.stringify({chapters:chapters.length,viewports:[1440,390,320],sourceFiles:27,browserErrors:errors,answers,status:'PASS'},null,2));
   await browser.close();console.log(`PASS: ${chapters.length} chapters at desktop/mobile, canvas pixels, 13 source/test pairs, controls, search, answers, theme, and navigation.`);

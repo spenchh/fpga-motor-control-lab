@@ -1,0 +1,17 @@
+Worked nominal example checked 2026-10-26
+Design source: spenchh/FPGA-foc-motor-control
+Design commit: 403730d5a780dc507cf42e4a531a077aca57214a
+Simulator: Icarus Verilog 12.0
+Stimulus: existing tb_foc_current_loop_top, unchanged
+Capture: trace_test.py tb_foc_current_loop_top
+Observation: settled nominal state at 435 ns, before the fault injection
+
+vq_q       = 2048
+v_beta_q   = 2047
+duty_a     = 500
+duty_b     = 527
+duty_c     = 472
+
+These are observed simulation codes for the directed nominal case.
+They do not establish motor-plant response, physical voltage calibration,
+complete PWM-cycle behavior, or arbitrary streaming alignment.
